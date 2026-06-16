@@ -1,5 +1,6 @@
 FROM python:3.12-slim
-
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 # Install system dependencies (Tesseract OCR & OpenCV runtime support)
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
@@ -17,7 +18,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy source code and config files
 COPY src/ /app/src/
-COPY models/ /app/models/
 
 # Expose default local port
 EXPOSE 8001
