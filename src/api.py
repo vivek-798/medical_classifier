@@ -7,6 +7,11 @@ import cv2
 import pypdfium2 as pdfium
 import pytesseract
 import io
+from dotenv import load_dotenv
+
+# Load environment variables at startup
+load_dotenv()
+
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -136,10 +141,9 @@ def classify_report(file: UploadFile = File(...)):
         matched_keywords = result["matched_keywords"]
         logger.info(f"Classification result: {category} (Confidence: {confidence})")
         
-        # 3. Log entry to Supabase database (passing virtual image_url)
-        virtual_image_url = f"stateless-uploads/{saved_filename}"
-        report_id = database.save_report_log(
-            image_path=virtual_image_url,
+        # 3. Log entry to Supabase database
+        report_id = database.save_report(
+            filename=filename,
             ocr_text=text_clean,
             predicted_category=category,
             confidence=confidence,
@@ -174,7 +178,7 @@ def classify_report(file: UploadFile = File(...)):
 def submit_feedback(req: FeedbackRequest):
     logger.info(f"Received feedback request for report ID: {req.report_id}")
     try:
-        success = database.update_report_feedback(
+        success = database.update_feedback(
             report_id=req.report_id,
             user_confirmation=req.user_confirmation,
             final_correct_label=req.final_correct_label

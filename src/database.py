@@ -1,22 +1,24 @@
 import os
-import json
-from datetime import datetime
+from dotenv import load_dotenv
 from supabase import create_client, Client
 
-# Initialize Supabase client
+# Load environment variables from .env file
+load_dotenv()
+
+# Initialize Supabase client using Service Role Key for administrative access
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+SUPABASE_SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
 
 supabase_client: Client = None
 
-if SUPABASE_URL and SUPABASE_KEY:
+if SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY:
     try:
-        supabase_client = create_client(SUPABASE_URL, SUPABASE_KEY)
-        print("Supabase client initialized successfully.")
+        supabase_client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+        print("Supabase client initialized successfully with Service Role Key.")
     except Exception as e:
         print(f"Error initializing Supabase client: {e}")
 else:
-    print("Warning: SUPABASE_URL or SUPABASE_KEY not found in environment variables. Database logging will be disabled.")
+    print("Warning: SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY not found in environment variables. Database logging will be disabled.")
 
 def init_db():
     """
@@ -32,45 +34,42 @@ def init_db():
         print("Database connection verified. 'reports' table is accessible in Supabase.")
     except Exception as e:
         print(f"Warning: Failed to connect/verify 'reports' table in Supabase: {e}")
-        print("Please ensure the 'reports' table has been created using the SQL script in DEPLOYMENT.md.")
+        print("Please ensure the 'reports' table has been created in your Supabase database.")
 
-def save_report_log(image_path: str, ocr_text: str, predicted_category: str, confidence: float, matched_keywords: list) -> int:
+def save_report(filename: str, ocr_text: str, predicted_category: str, confidence: float, matched_keywords: list, user_confirmation: str = None, final_correct_label: str = None) -> int:
     """
     Saves a report record to the Supabase database and returns the generated report ID.
+    Note: Supabase table schema uses 'created_at' (automated) and has no 'image_url' or 'upload_date' columns.
+    'matched_keywords' is stored as a native jsonb column (accepts list directly).
     """
     if not supabase_client:
         print("Warning: Supabase not configured. Log not saved to database.")
         return 0
-        
-    upload_date = datetime.now().isoformat()
-    matched_keywords_json = json.dumps(matched_keywords)
-    filename = os.path.basename(image_path)
     
     data = {
         "filename": filename,
-        "upload_date": upload_date,
-        "image_url": image_path,
         "ocr_text": ocr_text,
         "predicted_category": predicted_category,
         "confidence": float(confidence),
-        "matched_keywords": matched_keywords_json
+        "matched_keywords": matched_keywords, # jsonb column accepts list natively
+        "user_confirmation": user_confirmation,
+        "final_correct_label": final_correct_label
     }
     
     try:
         response = supabase_client.table("reports").insert(data).execute()
-        # The Supabase Python SDK returns a response object with a .data attribute
         if response.data and len(response.data) > 0:
             inserted_id = response.data[0].get("id")
-            print(f"Successfully saved log to Supabase. Record ID: {inserted_id}")
+            print(f"Successfully saved report to Supabase. Record ID: {inserted_id}")
             return inserted_id
         else:
             print("Warning: Supabase insert returned empty data response.")
             return 0
     except Exception as e:
-        print(f"Error saving log to Supabase: {e}")
+        print(f"Error saving report to Supabase: {e}")
         return 0
 
-def update_report_feedback(report_id: int, user_confirmation: str, final_correct_label: str) -> bool:
+def update_feedback(report_id: int, user_confirmation: str, final_correct_label: str) -> bool:
     """
     Updates the feedback columns for the given report_id in Supabase.
     """
