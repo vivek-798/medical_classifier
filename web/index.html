@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Lab Report Classifier</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-decor">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+    
+    <div class="app-container">
+        <header>
+            <div class="logo">
+                <span class="icon">🩺</span>
+                <h1>LabReport<span>AI</span></h1>
+            </div>
+            <p class="subtitle">Fast OCR extraction & clinical categorization service</p>
+        </header>
+
+        <main class="main-content">
+            <!-- Upload Card -->
+            <section class="card upload-card">
+                <h2>Upload Report</h2>
+                <p class="card-desc">Select a medical lab report image (PNG, JPG, JPEG, TIF) or PDF to analyze.</p>
+                
+                <form class="upload-form" id="uploadForm">
+                    <div class="dropzone" id="dropzone">
+                        <input type="file" name="document" id="fileInput" accept=".png,.jpg,.jpeg,.tif,.tiff,.pdf" required>
+                        <div class="dropzone-content" id="dropzoneContent">
+                            <span class="upload-icon">📤</span>
+                            <p class="primary-text">Drag and drop file here or <span>browse</span></p>
+                            <p class="secondary-text">Supported: PNG, JPG, JPEG, TIF, PDF (Max 10MB)</p>
+                        </div>
+                        <div class="file-preview-indicator" id="filePreview" style="display: none;">
+                            <span class="file-icon" id="fileIcon">📄</span>
+                            <span class="file-name" id="fileName">No file selected</span>
+                            <button type="button" class="btn btn-secondary btn-sm" id="clearFile">Remove</button>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+                        <span class="spinner" id="btnSpinner"></span>
+                        <span id="btnText">Analyze Report</span>
+                    </button>
+                </form>
+            </section>
+
+            <!-- Error Card (JS Managed) -->
+            <section class="card error-card" id="errorCard" style="display: none;">
+                <div class="error-header">
+                    <span class="error-icon">⚠️</span>
+                    <h2 id="errorTitle">Analysis Failed</h2>
+                </div>
+                <p class="error-message" id="errorMessage"></p>
+            </section>
+
+            <!-- Results Card (JS Managed) -->
+            <section class="card results-card fade-in" id="resultsCard" style="display: none;">
+                <div class="result-header">
+                    <h2>Analysis Result</h2>
+                    <span class="success-badge">Completed</span>
+                </div>
+
+                <div class="result-grid">
+                    <div class="result-metric-box">
+                        <p class="metric-label">Predicted Class</p>
+                        <h3 class="metric-value" id="predictedCategoryValue">-</h3>
+                    </div>
+                    
+                    <div class="result-metric-box">
+                        <p class="metric-label">Confidence Score</p>
+                        <div class="confidence-container">
+                            <h3 class="metric-value" id="confidenceValue">0%</h3>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="confidenceProgressFill" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="file-meta">
+                    <p><strong>Analyzed File:</strong> <span id="metaFileName">-</span></p>
+                </div>
+
+                <!-- Keywords Section -->
+                <div class="keywords-section">
+                    <h3>Matched Keywords</h3>
+                    <div class="keyword-tags" id="keywordTagsContainer">
+                        <span class="tag">None</span>
+                    </div>
+                </div>
+
+                <!-- Feedback Section -->
+                <div class="feedback-section" id="feedbackSection">
+                    <h3>Did we get this right?</h3>
+                    <div class="feedback-buttons" id="feedbackButtons">
+                        <button type="button" class="btn btn-correct" id="feedbackCorrectBtn">
+                            <span>Yes, Correct</span>
+                        </button>
+                        <button type="button" class="btn btn-incorrect" id="feedbackIncorrectBtn">
+                            <span>No, Incorrect</span>
+                        </button>
+                    </div>
+
+                    <!-- Dropdown and correction submit (shown if incorrect) -->
+                    <div class="feedback-incorrect-form" id="feedbackIncorrectForm" style="display: none;">
+                        <p class="card-desc" style="margin-bottom: 0.5rem;">Select the correct category:</p>
+                        <select class="select-input" id="correctCategorySelect">
+                            <!-- Populated dynamically by JS -->
+                        </select>
+                        <button type="button" class="btn btn-primary btn-sm" id="submitCorrectionBtn">
+                            Submit Correction
+                        </button>
+                    </div>
+
+                    <!-- Success message -->
+                    <div class="feedback-success-msg" id="feedbackSuccessMsg" style="display: none;">
+                        Thank you for your feedback!
+                    </div>
+                </div>
+
+                <div class="text-extraction-section">
+                    <div class="section-title-bar">
+                        <h3>Extracted Text (OCR)</h3>
+                        <button class="btn btn-secondary btn-sm" id="copyBtn">
+                            Copy Text
+                        </button>
+                    </div>
+                    <div class="ocr-text-box">
+                        <pre id="ocrTextContent">No text extracted.</pre>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>&copy; 2026 Medical Lab Report Classification System</p>
+        </footer>
+    </div>
+
+    <!-- Configuration and App Logic Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>
