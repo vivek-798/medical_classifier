@@ -63,20 +63,7 @@ let currentReportId = null;
 let currentPredictedCategory = null;
 
 // Initialize app config
-async function initConfig() {
-    try {
-        const response = await fetch("config.json");
-        if (response.ok) {
-            const config = await response.json();
-            if (config.API_BASE_URL) {
-                API_BASE_URL = config.API_BASE_URL.replace(/\/$/, ""); // Trim trailing slash
-                console.log("Configured API Base URL:", API_BASE_URL);
-            }
-        }
-    } catch (e) {
-        console.warn("Could not load config.json, using default API base URL:", API_BASE_URL);
-    }
-}
+
 
 // Setup correction select options
 function setupCategoryDropdown() {
@@ -310,6 +297,5 @@ submitCorrectionBtn.addEventListener('click', () => {
 
 // Initialization
 document.addEventListener("DOMContentLoaded", () => {
-    // initConfig();
     setupCategoryDropdown();
 });
