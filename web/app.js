@@ -1,5 +1,5 @@
 // Configuration
-let API_BASE_URL = "http://127.0.0.1:8001"; // Fallback URL
+let API_BASE_URL = fetch("https://medical-classifier-backend-3u8j.onrender.com/classify"); // Fallback URL
 
 const MEDICAL_CATEGORIES = {
     "cbc": "CBC (Complete Blood Count)",
