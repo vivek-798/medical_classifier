@@ -1,5 +1,6 @@
 // Configuration
 let API_BASE_URL = "https://medical-classifier-backend-3u8j.onrender.com";
+
 const MEDICAL_CATEGORIES = {
     "cbc": "CBC (Complete Blood Count)",
     "crp": "CRP (C-Reactive Protein)",
@@ -309,6 +310,6 @@ submitCorrectionBtn.addEventListener('click', () => {
 
 // Initialization
 document.addEventListener("DOMContentLoaded", () => {
-    initConfig();
+    // initConfig();
     setupCategoryDropdown();
 });
